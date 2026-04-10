@@ -1,6 +1,12 @@
 name: CI part to push the dockerhub
 on:
-  [workflow_dispatch]
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   publish_images:
     runs-on: ubuntu-latest
