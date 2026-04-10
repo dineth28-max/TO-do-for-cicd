@@ -8,7 +8,7 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v4
       - name: Docker Build
-        run : docker build -t dineth123412/news1:latest 
+        run: docker build -t dineth123412/news1:latest .
       - name: docker login and push
         run: |
           docker login -u dineth123412 -p ${{secrets.DOCKER}}
