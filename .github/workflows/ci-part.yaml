@@ -1,0 +1,15 @@
+name: CI part to push the dockerhub
+on:
+  [workflow_dispatch]
+jobs:
+  publish_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+      - name: Docker Build
+        run : docker build -t dineth123412/news1:latest 
+      - name: docker login and push
+        run: |
+          docker login -u dineth123412 -p ${{secrets.DOCKER}}
+          docker push dineth123412/news1:latest
