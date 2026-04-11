@@ -57,6 +57,11 @@ resource "aws_eip_association" "public_ec2_eip_assoc" {
     interpreter = ["wsl", "--cd", "~", "bash", "-lc"]
     command     = "set -e; mkdir -p ~/.ssh; cp '${local.key_wsl_path}' ~/.ssh/terraform_cicd.pem; chmod 600 ~/.ssh/terraform_cicd.pem; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${aws_eip.public_ec2_eip.public_ip},' -u '${var.ansible_ssh_user}' --private-key ~/.ssh/terraform_cicd.pem '${local.module_wsl_path}/ansible/install-docker.yml'"
   }
+
+  provisioner "local-exec" {
+    interpreter = ["wsl", "--cd", "~", "bash", "-lc"]
+    command     = "set -e; sleep 30; ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${aws_eip.public_ec2_eip.public_ip},' -u '${var.ansible_ssh_user}' --private-key ~/.ssh/terraform_cicd.pem '${local.module_wsl_path}/ansible/install-github-runner.yml'"
+  }
 }
 
 

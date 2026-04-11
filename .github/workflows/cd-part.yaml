@@ -1,0 +1,22 @@
+name: CD pipleine
+on:
+  workflow_run:
+    workflows: ["CI part to push the dockerhub"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: down the docker container is live
+        run: docker new1 down || true
+      - name: pull the docker image
+        run: docker pull dineth123412/news1:latest
+      - name: remove the 5th docker image
+        run: docker rmi $(docker images -q | sed -n '5p')
+      - name: run the docker container
+        run: docker run -d -p 5000:5000 --name new1 dineth123412/news1:latest
+
+      
+      

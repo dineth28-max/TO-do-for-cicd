@@ -1,0 +1,86 @@
+---
+- name: Install and Configure GitHub Actions Self-Hosted Runner
+  hosts: all
+  become: yes
+  vars:
+    runner_version: "2.333.1"
+    runner_home: "/home/ubuntu/actions-runner"
+    runner_url: "https://github.com/dineth28-max/TO-do-for-cicd"
+    runner_token: "BTDUD4HZ2NWSQCPKUZILIR3J3IB5S"
+    runner_name: "ec2-self-hosted-runner"
+    runner_sha256: "18f8f68ed1892854ff2ab1bab4fcaa2f5abeedc98093b6cb13638991725cab74"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required dependencies
+      apt:
+        name:
+          - curl
+          - tar
+          - ca-certificates
+        state: present
+    - name: Check if runner already installed
+      stat:
+        path: "{{ runner_home }}/config.sh"
+      register: runner_installed
+
+    - name: Remove old runner installation if exists
+      shell: |
+        cd {{ runner_home }}
+        ./svc.sh uninstall 2>/dev/null || true
+        cd /home/ubuntu
+        rm -rf actions-runner
+      ignore_errors: yes
+      when: runner_installed.stat.exists
+
+
+    - name: Create actions-runner directory
+      file:
+        path: "{{ runner_home }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Download GitHub Actions Runner
+      shell: |
+        cd {{ runner_home }}
+        curl -o actions-runner-linux-x64-{{ runner_version }}.tar.gz -L \
+          https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-x64-{{ runner_version }}.tar.gz
+      become_user: ubuntu
+
+    - name: Validate runner package checksum
+      shell: |
+        cd {{ runner_home }}
+        echo "{{ runner_sha256 }}  actions-runner-linux-x64-{{ runner_version }}.tar.gz" | sha256sum -c -
+      become_user: ubuntu
+
+    - name: Extract runner package
+      shell: |
+        cd {{ runner_home }}
+        tar xzf ./actions-runner-linux-x64-{{ runner_version }}.tar.gz
+      become_user: ubuntu
+
+    - name: Configure GitHub Actions Runner
+      shell: |
+        cd {{ runner_home }}
+        ./config.sh --url {{ runner_url }} --token {{ runner_token }} --name {{ runner_name }} --unattended --replace
+      become_user: ubuntu
+
+    - name: Install runner as a systemd service
+      shell: |
+        cd {{ runner_home }}
+        ./svc.sh install ubuntu
+
+    - name: Start GitHub Actions Runner service
+      shell: |
+        cd {{ runner_home }}
+        ./svc.sh start
+
+    - name: Display runner installation status
+      debug:
+        msg: "GitHub Actions Self-Hosted Runner installed and configured successfully on {{ inventory_hostname }}"
