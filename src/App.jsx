@@ -48,7 +48,7 @@ function App() {
   return (
     <div className="app-container">
       <header>
-        <h1>Tasks</h1>
+        <h1>Tassks</h1>
         <p className="task-stats">
           {completedCount} completed, {todos.length - completedCount} open
         </p>
