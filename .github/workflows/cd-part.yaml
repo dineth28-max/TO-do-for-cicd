@@ -11,10 +11,6 @@ jobs:
   
     runs-on: self-hosted
     steps:
-      - name: Set image tag
-        shell: bash
-        run: echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_ENV"
-
       - name: remove old container
         run: docker rm -f new1 || true
 
@@ -29,29 +25,25 @@ jobs:
           fi
           
       - name: pull the docker image
-        run: docker pull dineth123412/news1:${IMAGE_TAG}
+        run: docker pull dineth123412/news1:latest
 
       - name: keep only 5 newest docker images
         shell: bash
         run: |
-          mapfile -t image_ids < <(
-            docker image ls -q --filter=reference='dineth123412/news1:*' \
-            | awk '!seen[$0]++'
+          mapfile -t image_rows < <(
+            docker image ls dineth123412/news1 --format '{{.Repository}}:{{.Tag}} {{.CreatedAt}}' \
+            | grep -v ':latest ' \
+            | sort -k2,3 -r
           )
 
-          if [ ${#image_ids[@]} -le 5 ]; then
+          if [ ${#image_rows[@]} -le 5 ]; then
             echo "No old images to delete."
             exit 0
           fi
 
-          mapfile -t sorted_ids < <(
-            for image_id in "${image_ids[@]}"; do
-              created_at=$(docker image inspect --format '{{.Created}}' "$image_id")
-              printf '%s %s\n' "$created_at" "$image_id"
-            done | sort -r | awk '{print $2}'
+          mapfile -t old_images < <(
+            printf '%s\n' "${image_rows[@]:5}" | awk '{print $1}'
           )
-
-          old_images=("${sorted_ids[@]:5}")
 
           if [ ${#old_images[@]} -gt 0 ]; then
             docker image rm "${old_images[@]}" || true
@@ -60,7 +52,7 @@ jobs:
           fi
 
       - name: run the docker container
-        run: docker run -d --name new1 -p 5000:5000 dineth123412/news1:${IMAGE_TAG}
+        run: docker run -d --name new1 -p 5000:5000 dineth123412/news1:latest
 
       
       
