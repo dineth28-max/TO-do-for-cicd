@@ -10,8 +10,8 @@ jobs:
   
     runs-on: self-hosted
     steps:
-      - name: down the docker container is live
-        run: docker new1 down || true
+      - name: stop and remove old container
+        run: docker rm -f new1 || true
       - name: pull the docker image
         run: docker pull dineth123412/news1:latest
       - name: keep only 5 newest docker images
