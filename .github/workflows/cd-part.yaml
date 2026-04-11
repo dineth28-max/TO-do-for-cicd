@@ -11,7 +11,7 @@ jobs:
   
     runs-on: self-hosted
     steps:
-      - name: Set image tag from CI run
+      - name: Set image tag 
         shell: bash
         run: echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" | cut -c1-22 >> "$GITHUB_ENV"
 
