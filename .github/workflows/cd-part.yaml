@@ -24,7 +24,7 @@ jobs:
             echo "No old images to delete."
           fi
       - name: run the docker container
-        run: docker run -d -p 5000:5000 --name new1 dineth123412/news1:latest
+        run: docker run -d -p 5000:5000 dineth123412/news1:latest
 
       
       
