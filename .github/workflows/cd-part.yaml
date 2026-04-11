@@ -12,6 +12,13 @@ jobs:
     steps:
       - name: stop and remove old container
         run: docker rm -f new1 || true
+      - name: remove any container using port 5000
+        shell: bash
+        run: |
+          mapfile -t port_containers < <(docker ps -q --filter publish=5000)
+          if [ ${#port_containers[@]} -gt 0 ]; then
+            docker rm -f "${port_containers[@]}" || true
+          
       - name: pull the docker image
         run: docker pull dineth123412/news1:latest
       - name: keep only 5 newest docker images
@@ -24,7 +31,7 @@ jobs:
             echo "No old images to delete."
           fi
       - name: run the docker container
-        run: docker run -d -p 5000:5000 dineth123412/news1:latest
+        run: docker run -d --name new1 -p 5000:5000 dineth123412/news1:latest
 
       
       
