@@ -6,7 +6,7 @@
     runner_version: "2.333.1"
     runner_home: "/home/ubuntu/actions-runner"
     runner_url: "https://github.com/dineth28-max/TO-do-for-cicd"
-    runner_token: "BTDUD4HZ2NWSQCPKUZILIR3J3IB5S"
+    runner_token: "BTDUD4E2S2TDE7Q4WNXGZ6LJ3IPXE"
     runner_name: "ec2-self-hosted-runner"
     runner_sha256: "18f8f68ed1892854ff2ab1bab4fcaa2f5abeedc98093b6cb13638991725cab74"
 
@@ -28,7 +28,7 @@
         path: "{{ runner_home }}/config.sh"
       register: runner_installed
 
-    - name: Remove old runner installation if exists
+    - name: Remove old runner installation 
       shell: |
         cd {{ runner_home }}
         ./svc.sh uninstall 2>/dev/null || true
@@ -81,6 +81,4 @@
         cd {{ runner_home }}
         ./svc.sh start
 
-    - name: Display runner installation status
-      debug:
-        msg: "GitHub Actions Self-Hosted Runner installed and configured successfully on {{ inventory_hostname }}"
+ 
