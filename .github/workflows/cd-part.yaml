@@ -27,7 +27,7 @@ jobs:
       - name: pull the docker image
         run: docker pull dineth123412/news1:latest
 
-      - name: keep only 5 newest docker images
+      - name: keep only 5 newest docker images (Cleanup logic)
         shell: bash
         run: |
           mapfile -t image_rows < <(
