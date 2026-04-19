@@ -54,5 +54,7 @@ jobs:
       - name: run the docker container
         run: docker run -d --name new1 -p 5000:5000 dineth123412/news1:latest
 
+        
+
       
       
